@@ -1,12 +1,12 @@
 === DADOS DOS SENSORES ===
-Timestamp: 30/08/2025 16:13:30
+Timestamp: 30/08/2025 16:17:45
 Sensores: 3
 
 === VALORES ATUAIS ===
-Temperatura: 28,4°C
-Presença: true
-Luminosidade: 654 lux
+Temperatura: 22,3°C
+Presença: false
+Luminosidade: 122 lux
 Dispositivos:
 - Luz: DESLIGADO
-- Ventilador: LIGADO
+- Ventilador: DESLIGADO
  
