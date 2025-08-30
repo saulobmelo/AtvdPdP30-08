@@ -1,0 +1,13 @@
+=== RELATÓRIO DO SISTEMA ===
+Gerado em: 2025-08-30T16:12:29.191281800
+
+SENSORES:
+- Total: 3
+- Tipos: [TEMPERATURE, PRESENCE, LIGHT]
+
+DISPOSITIVOS:
+- Luz: DESLIGADO
+- Ventilador: DESLIGADO
+
+ESTATÍSTICAS:
+- Ciclos processados: 1
