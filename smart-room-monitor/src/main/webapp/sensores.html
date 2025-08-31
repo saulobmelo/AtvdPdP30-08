@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sensores - Smart Room Monitor</title>
+    
+    <!-- Bootstrap 4 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+    
+    <!-- Box Icons -->
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/custom.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="main-header">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <h1 class="navbar-brand mb-0">
+                    <i class='bx bx-cog header-icon'></i>
+                    Gestão de Sensores
+                </h1>
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">
+                            <i class='bx bx-home'></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="relatorios.html">
+                            <i class='bx bx-bar-chart-alt-2'></i> Relatórios
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container mt-4">
+            <!-- Formulário para Adicionar Sensor -->
+            <section class="add-sensor-section mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="mb-0">
+                            <i class='bx bx-plus-circle'></i>
+                            Adicionar Novo Sensor
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <form id="sensor-form">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="sensor-id">ID do Sensor</label>
+                                        <input type="text" class="form-control" id="sensor-id" 
+                                               placeholder="Ex: TEMP003" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="sensor-name">Nome</label>
+                                        <input type="text" class="form-control" id="sensor-name" 
+                                               placeholder="Ex: Sensor da Janela" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="sensor-type">Tipo</label>
+                                        <select class="form-control" id="sensor-type" required>
+                                            <option value="">Selecione...</option>
+                                            <option value="temperatura">Temperatura</option>
+                                            <option value="presenca">Presença</option>
+                                            <option value="luminosidade">Luminosidade</option>
+                                            <option value="umidade">Umidade</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="sensor-value">Valor Inicial</label>
+                                        <input type="text" class="form-control" id="sensor-value" 
+                                               placeholder="Ex: 22.5" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class='bx bx-plus'></i>
+                                        Adicionar Sensor
+                                    </button>
+                                    <button type="reset" class="btn btn-outline-secondary ml-2">
+                                        <i class='bx bx-x'></i>
+                                        Limpar
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Lista de Sensores -->
+            <section class="sensors-list-section">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h3 class="mb-0">
+                            <i class='bx bx-list-ul'></i>
+                            Sensores Cadastrados
+                        </h3>
+                        <button class="btn btn-outline-primary btn-sm" onclick="loadSensors()">
+                            <i class='bx bx-refresh'></i>
+                            Atualizar
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div id="sensors-container">
+                            <div class="text-center">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="sr-only">Carregando...</span>
+                                </div>
+                                <p class="mt-2">Carregando sensores...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // JavaScript específico para página de sensores
+        const API_BASE = '/api';
+        let updateTimer = null;
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSensors();
+            setupForm();
+            startAutoUpdate();
+        });
+
+        // Iniciar atualização automática
+        function startAutoUpdate() {
+            if (updateTimer) clearInterval(updateTimer);
+            updateTimer = setInterval(loadSensors, 5000); // Atualizar a cada 5 segundos
+        }
+
+        // Parar atualização automática
+        function stopAutoUpdate() {
+            if (updateTimer) {
+                clearInterval(updateTimer);
+                updateTimer = null;
+            }
+        }
+
+        // Detectar quando a página perde/ganha foco
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                stopAutoUpdate();
+            } else {
+                startAutoUpdate();
+                loadSensors(); // Recarregar imediatamente
+            }
+        });
+
+        // Carregar lista de sensores
+        async function loadSensors() {
+            const container = document.getElementById('sensors-container');
+            
+            try {
+                const response = await fetch(`${API_BASE}/sensors`);
+                const data = await response.json();
+                
+                if (response.ok && data.sensors) {
+                    if (data.sensors.length === 0) {
+                        container.innerHTML = '<p class="text-muted text-center">Nenhum sensor cadastrado</p>';
+                        return;
+                    }
+                    
+                    // Criar HTML para sensores
+                    const sensorsHtml = data.sensors.map(sensor => `
+                        <div class="sensor-item border rounded p-3 mb-2">
+                            <div class="row align-items-center">
+                                <div class="col-md-2">
+                                    <strong>${sensor.id}</strong>
+                                </div>
+                                <div class="col-md-3">
+                                    ${sensor.nome}
+                                </div>
+                                <div class="col-md-2">
+                                    <span class="badge badge-${getTypeBadgeColor(sensor.tipo)}">
+                                        ${sensor.tipo}
+                                    </span>
+                                </div>
+                                <div class="col-md-2">
+                                    ${sensor.valor}
+                                </div>
+                                <div class="col-md-2">
+                                    <span class="badge badge-${sensor.ativo ? 'success' : 'secondary'}">
+                                        ${sensor.ativo ? 'Ativo' : 'Inativo'}
+                                    </span>
+                                </div>
+                                <div class="col-md-1">
+                                    <button class="btn btn-sm btn-outline-danger" 
+                                            onclick="removeSensor('${sensor.id}')">
+                                        <i class='bx bx-trash'></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                    
+                    container.innerHTML = sensorsHtml;
+                } else {
+                    throw new Error('Erro ao carregar sensores');
+                }
+            } catch (error) {
+                container.innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class='bx bx-error'></i>
+                        Erro ao carregar sensores: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // Configurar formulário
+        function setupForm() {
+            const form = document.getElementById('sensor-form');
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const formData = {
+                    id: document.getElementById('sensor-id').value,
+                    nome: document.getElementById('sensor-name').value,
+                    tipo: document.getElementById('sensor-type').value,
+                    valor: document.getElementById('sensor-value').value
+                };
+                
+                try {
+                    const response = await fetch(`${API_BASE}/sensors`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(formData)
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (response.ok && result.success) {
+                        showAlert('Sensor adicionado com sucesso!', 'success');
+                        form.reset();
+                        loadSensors(); // Recarregar lista imediatamente
+                    } else {
+                        showAlert(result.error || 'Erro ao adicionar sensor', 'danger');
+                    }
+                } catch (error) {
+                    showAlert('Erro de conexão: ' + error.message, 'danger');
+                }
+            });
+        }
+
+        // Remover sensor
+        async function removeSensor(sensorId) {
+            if (!confirm(`Tem certeza que deseja remover o sensor ${sensorId}?`)) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/sensor/${sensorId}`, {
+                    method: 'DELETE'
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok && result.success) {
+                    showAlert('Sensor removido com sucesso!', 'success');
+                    loadSensors(); // Recarregar lista imediatamente
+                } else {
+                    showAlert(result.error || 'Erro ao remover sensor', 'danger');
+                }
+            } catch (error) {
+                showAlert('Erro de conexão: ' + error.message, 'danger');
+            }
+        }
+
+        // Utilitários
+        function getTypeBadgeColor(type) {
+            const colors = {
+                'temperatura': 'danger',
+                'presenca': 'success',
+                'luminosidade': 'warning',
+                'umidade': 'info'
+            };
+            return colors[type] || 'secondary';
+        }
+
+        function showAlert(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+            alertDiv.innerHTML = `
+                ${message}
+                <button type="button" class="close" data-dismiss="alert">
+                    <span>&times;</span>
+                </button>
+            `;
+            
+            const container = document.querySelector('.container');
+            container.insertBefore(alertDiv, container.firstChild);
+            
+            setTimeout(() => {
+                if (alertDiv.parentNode) {
+                    alertDiv.remove();
+                }
+            }, 5000);
+        }
+
+        // Cleanup ao sair da página
+        window.addEventListener('beforeunload', () => {
+            stopAutoUpdate();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,20 @@
+=== RELATÓRIO DO SISTEMA ===
+Gerado em: 30/08/2025 22:29:10
+
+SENSORES:
+- Total: 0
+- Temperatura: 29.1°C
+- Presença: NÃO
+- Luminosidade: 217 lux
+
+DISPOSITIVOS:
+- Luz: DESLIGADA
+- Ventilador: DESLIGADO
+
+ESTATÍSTICAS:
+- Ciclos processados: 6
+- Ações no log: 2
+
+ÚLTIMAS AÇÕES:
+- 30/08/2025 22:29:00 - Luz LIGADA
+- 30/08/2025 22:29:05 - Luz DESLIGADA (sem presença)

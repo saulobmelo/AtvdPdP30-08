@@ -1,6 +1,19 @@
 
 package main.java.com.smartroom;
 
+import main.java.com.smartroom.actuators.Actuator;
+import main.java.com.smartroom.actuators.SimpleActuator;
+import main.java.com.smartroom.repository.FileRepository;
+import main.java.com.smartroom.repository.Repository;
+import main.java.com.smartroom.rules.DefaultRuleEngine;
+import main.java.com.smartroom.rules.RuleEngine;
+import main.java.com.smartroom.sensors.FakeLightSensor;
+import main.java.com.smartroom.sensors.FakePresenceSensor;
+import main.java.com.smartroom.sensors.FakeTemperatureSensor;
+import main.java.com.smartroom.sensors.Sensor;
+import main.java.com.smartroom.time.Clock;
+import main.java.com.smartroom.time.SystemClock;
+
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;

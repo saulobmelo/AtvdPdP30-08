@@ -1,6 +1,8 @@
 
 package main.java.com.smartroom;
 
+import main.java.com.smartroom.repository.Repository;
+
 import java.nio.file.Path;
 import java.util.Scanner;
 
@@ -22,8 +24,7 @@ public class Main {
         System.out.print("Escolha: ");
         String choice = sc.nextLine().trim();
 
-        switch (choice) {
-            case "1" -> {
+        switch (choice) {            case "1" -> {
                 controller.runOnce();
                 System.out.println(controller.generateReport());
                 ServiceLocator.resolve(Repository.class).writeReport(controller.generateReport());
